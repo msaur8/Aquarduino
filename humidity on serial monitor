@@ -2,7 +2,7 @@
 
 dht  DHT; 
 
-#define DHT11_PIN 7 // define DHT pin
+#define DHT11_PIN 4 // define DHT pin
 
 void setup(){
   Serial.begin(9600);  // Start serial communication
@@ -23,7 +23,7 @@ void loop(){
       Take a DHT11 sensor.
       there, in the DHT11 sensor, there  are 3 or 4 pins.
       There, on the DHT11 sensor, there is writen S, +, -
-      connect "S" on the digital pin 7.
+      connect "S" on the digital pin 4.
       connect "+" on the 5V pin on  Arduino.
       connect "-" on the GND pin on Arduino.
       
