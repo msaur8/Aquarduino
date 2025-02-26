@@ -1,0 +1,21 @@
+int pump = 2;      // Pin for pump (change if needed)
+int moisture = A1; // Pin for moisture sensor (change if needed)
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(pump, OUTPUT);
+}
+
+void loop() {
+  int moistureRaw = analogRead(moisture); // Read sensor value
+  int moistureReal = map(moistureRaw, 1023, 0, 0, 100); // Convert to percentage
+
+  Serial.println(moistureReal); // Print moisture level
+  delay(100);
+
+  if (moistureReal > 50) { // If moisture is below 30%, turn pump ON
+    digitalWrite(pump, HIGH);
+  } else {
+    digitalWrite(pump, LOW);
+  }
+}
