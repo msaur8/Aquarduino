@@ -1,0 +1,23 @@
+const int relayPin = 2; // Set the Arduino pin connected to the relay module
+
+
+
+void setup() {
+
+  pinMode(relayPin, OUTPUT); // Set the relay pin as output
+
+}
+
+
+
+void loop() {
+
+  digitalWrite(relayPin, HIGH); // Turn pump on
+
+  delay(5000); // Wait for 5 seconds
+
+  digitalWrite(relayPin, LOW); // Turn pump off
+
+  delay(5000); // Wait for 5 seconds
+
+}
