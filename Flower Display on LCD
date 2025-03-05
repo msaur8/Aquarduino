@@ -1,0 +1,34 @@
+//Flower display on LCD Display
+
+void drawFlower(int x, int y, int size, uint16_t petalColor, uint16_t centerColor, uint16_t stemColor) {
+  // Draw stem
+  tft.drawFastVLine(x, y, size * 2, stemColor);
+
+  // Draw petals (circles around the center)
+  tft.fillCircle(x - size / 2, y - size / 2, size / 2, petalColor);
+  tft.fillCircle(x + size / 2, y - size / 2, size / 2, petalColor);
+  tft.fillCircle(x - size / 2, y + size / 2, size / 2, petalColor);
+  tft.fillCircle(x + size / 2, y + size / 2, size / 2, petalColor);
+
+  // Draw flower center
+  tft.fillCircle(x, y, size / 2, centerColor);
+}
+
+void setup() {
+  Serial.begin(9600);
+  tft.begin();
+  tft.fillScreen(ILI9488_BLACK);
+
+  // Draw flowers at the bottom
+  int screenWidth = tft.width();
+  int screenHeight = tft.height();
+  int flowerSize = 20; // Adjust size as needed
+
+  for (int i = flowerSize; i < screenWidth; i += 40) { 
+    drawFlower(i, screenHeight - flowerSize * 2, flowerSize, ILI9488_RED, ILI9488_YELLOW, ILI9488_GREEN);
+  }
+}
+
+void loop() {
+  // No continuous drawing required
+}
