@@ -38,11 +38,11 @@ void loop() {
   Serial.print("Soil Moisture: "); Serial.print(moistureReal); Serial.println("%");
   
   // Control Pump
-  //if (moistureReal > 50) { 
-    //digitalWrite(PUMP_PIN, HIGH);
-  //} else {
-   // digitalWrite(PUMP_PIN, LOW);
-  //}
+  if (moistureReal > 50) { 
+    digitalWrite(PUMP_PIN, HIGH);
+  } else {
+    digitalWrite(PUMP_PIN, LOW);
+  }
 
   // Display on LCD
   tft.fillScreen(ILI9488_BLACK);
