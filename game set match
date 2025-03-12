@@ -35,37 +35,27 @@ void setup() {
   tft.setRotation(3); 
   tft.fillScreen(ILI9488_BLACK);
 
-  // Display Greeting (Higher on screen)
+  // Display Greeting
   tft.setTextSize(3);
-  tft.setCursor(30, 20);
+  tft.setCursor(30, 10);
   tft.setTextColor(ILI9488_YELLOW);
   tft.print("Hello :)");
 
-  // Display Rainbow Date (Higher on screen)
-  printRainbowText(180, 20, "March 12, 2025");
+  // Display Rainbow Date
+  printRainbowText(180, 10, "March 12, 2025");
 
-  // Spacing before vitals
-  tft.setCursor(30, 80);
-  tft.setTextColor(ILI9488_WHITE);
-  tft.print("----------------------");
-
-  // Initial Display Setup (Vitals start lower)
-  tft.setCursor(30, 120);
+  // Initial Display Setup
+  tft.setCursor(30, 50);
   tft.setTextColor(ILI9488_WHITE);  
   tft.print("Temp: ");
 
-  tft.setCursor(30, 170);
+  tft.setCursor(30, 100);
   tft.setTextColor(ILI9488_CYAN);
   tft.print("Humidity: ");
 
-  tft.setCursor(30, 220);
+  tft.setCursor(30, 150);
   tft.setTextColor(ILI9488_GREEN);
   tft.print("Moisture: ");
-
-  // Extra spacing before plants
-  tft.setCursor(30, 270);
-  tft.setTextColor(ILI9488_WHITE);
-  tft.print("----------------------");
 
   drawPlants(); // Draw plants & flowers at the bottom
 }
@@ -91,7 +81,7 @@ void loop() {
   tft.setTextSize(3);
   
   if (temperature != prevTemperature) {
-    tft.setCursor(180, 120);
+    tft.setCursor(180, 50);
     tft.setTextColor(ILI9488_WHITE, ILI9488_BLACK);
     tft.print(temperature);
     tft.print(" C");
@@ -99,7 +89,7 @@ void loop() {
   }
 
   if (humidity != prevHumidity) {
-    tft.setCursor(220, 170);
+    tft.setCursor(220, 100);
     tft.setTextColor(ILI9488_CYAN, ILI9488_BLACK);
     tft.print(humidity);
     tft.print(" %");
@@ -107,7 +97,7 @@ void loop() {
   }
 
   if (moistureReal != prevMoisture) {
-    tft.setCursor(220, 220);
+    tft.setCursor(220, 150);
     tft.setTextColor(ILI9488_GREEN, ILI9488_BLACK);
     tft.print(moistureReal);
     tft.print(" %");
@@ -119,11 +109,11 @@ void loop() {
 
 // Function to draw plants & flowers at the bottom
 void drawPlants() {
-  int baseY = 340; // Lower so there's space
+  int baseY = 220; // Bottom of the screen
   int potHeight = 15;
   int stemHeight = 20;
 
-  for (int i = 30; i <= 290; i += 60) { // Evenly spaced plants
+  for (int i = 30; i <= 290; i += 60) { // More evenly spaced plants
     // Draw pot
     tft.fillRect(i, baseY, 25, potHeight, BROWN); 
 
@@ -168,3 +158,4 @@ void printRainbowText(int x, int y, String text) {
     tft.print(text[i]);
   }
 }
+
