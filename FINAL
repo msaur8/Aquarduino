@@ -1,0 +1,166 @@
+#include "SPI.h"
+#include <Adafruit_GFX.h>
+#include <ILI9488.h>
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+
+#define TFT_CS   8
+#define TFT_DC   10
+#define TFT_RST  9
+
+#define DHTPIN 4        
+#define DHTTYPE DHT11   
+#define PUMP_PIN 2
+#define MOISTURE_PIN A1
+
+#define BROWN 0xA145  // Pot color
+#define YELLOW 0xFFE0 // Yellow flower
+#define PINK 0xF81F   // Pink flower
+#define WHITE 0xFFFF  // White flower
+#define GREEN ILI9488_GREEN
+
+DHT dht(DHTPIN, DHTTYPE);
+ILI9488 tft = ILI9488(TFT_CS, TFT_DC, TFT_RST);
+
+float prevTemperature = -100; 
+float prevHumidity = -100;
+int prevMoisture = -1;
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  pinMode(PUMP_PIN, OUTPUT);
+
+  tft.begin();
+  tft.setRotation(3); 
+  tft.fillScreen(ILI9488_BLACK);
+
+  // Display Greeting
+  tft.setTextSize(3);
+  tft.setCursor(30, 20);
+  tft.setTextColor(ILI9488_YELLOW);
+  tft.print("Hello :)");
+
+  // Display Rainbow Date
+  printRainbowText(180, 20, "March 12, 2025");
+
+  // Spacing before vitals
+  tft.setCursor(30, 80);
+  tft.setTextColor(ILI9488_WHITE);
+  tft.print("----------------------");
+
+  // Initial Display Setup
+  tft.setCursor(30, 120);
+  tft.setTextColor(ILI9488_WHITE);  
+  tft.print("Temp: ");
+
+  tft.setCursor(30, 170);
+  tft.setTextColor(ILI9488_CYAN);
+  tft.print("Humidity: ");
+
+  tft.setCursor(30, 220);
+  tft.setTextColor(ILI9488_GREEN);
+  tft.print("Moisture: ");
+
+  // Extra spacing before plants
+  tft.setCursor(30, 270);
+  tft.setTextColor(ILI9488_WHITE);
+  tft.print("----------------------");
+
+  drawPlants(); // Draw plants & flowers
+}
+
+void loop() {
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+  int moistureRaw = analogRead(MOISTURE_PIN);
+  int moistureReal = map(moistureRaw, 1023, 0, 0, 100);
+
+  Serial.print("Temperature: "); Serial.print(temperature); Serial.println("°C");
+  Serial.print("Humidity: "); Serial.print(humidity); Serial.println("%");
+  Serial.print("Soil Moisture: "); Serial.print(moistureReal); Serial.println("%");
+
+  // Control Pump
+  digitalWrite(PUMP_PIN, moistureReal < 55 ? LOW : HIGH);
+
+  // Update display only if values have changed
+  tft.setTextSize(3);
+
+  if (temperature != prevTemperature) {
+    tft.setCursor(180, 120);
+    tft.setTextColor(ILI9488_WHITE, ILI9488_BLACK);
+    tft.print(temperature);
+    tft.print(" C");
+    prevTemperature = temperature;
+  }
+
+  if (humidity != prevHumidity) {
+    tft.setCursor(220, 170);
+    tft.setTextColor(ILI9488_CYAN, ILI9488_BLACK);
+    tft.print(humidity);
+    tft.print(" %");
+    prevHumidity = humidity;
+  }
+
+  if (moistureReal != prevMoisture) {
+    tft.setCursor(220, 220);
+    tft.setTextColor(ILI9488_GREEN, ILI9488_BLACK);
+    tft.print(moistureReal);
+    tft.print(" %");
+    prevMoisture = moistureReal;
+  }
+
+  delay(2000);
+}
+
+// Function to draw plants & flowers at the bottom
+void drawPlants() {
+  int baseY = 320; // Keep the same
+  int potHeight = 15;
+  int stemHeight = 25; // Maintain same height
+
+  for (int i = 40; i <= 280; i += 50) { // **Decreased spacing** (from 60 to 50)
+    // Draw pot
+    tft.fillRect(i, baseY, 25, potHeight, BROWN); 
+
+    // Draw stem
+    tft.drawLine(i + 12, baseY, i + 12, baseY - stemHeight, GREEN);
+
+    // Randomly decide between leaves 🌱 or a flower 🌼
+    int plantType = random(0, 3); // 0 = leaves, 1 = pink flower, 2 = yellow flower
+    if (plantType == 0) {
+      drawLeaves(i + 12, baseY - stemHeight);
+    } else {
+      drawFlower(i + 12, baseY - stemHeight - 5, plantType);
+    }
+  }
+}
+
+// Draws leaves 🌱
+void drawLeaves(int x, int y) {
+  tft.drawLine(x, y, x - 5, y - 7, GREEN);
+  tft.drawLine(x, y, x + 5, y - 7, GREEN);
+}
+
+// Draws a flower 🌼 with a chosen color
+void drawFlower(int x, int y, int type) {
+  uint16_t color = (type == 1) ? PINK : YELLOW; // Pink or yellow flowers
+  tft.fillCircle(x - 4, y, 3, color); // Left petal
+  tft.fillCircle(x + 4, y, 3, color); // Right petal
+  tft.fillCircle(x, y - 4, 3, color); // Top petal
+  tft.fillCircle(x, y + 4, 3, color); // Bottom petal
+  tft.fillCircle(x, y, 3, WHITE);     // Center is white
+}
+
+// Function to print text in a rainbow gradient 🌈
+void printRainbowText(int x, int y, String text) {
+  uint16_t colors[] = {ILI9488_RED, ILI9488_ORANGE, ILI9488_YELLOW, ILI9488_GREEN, ILI9488_CYAN, ILI9488_BLUE, ILI9488_MAGENTA};
+  int colorCount = sizeof(colors) / sizeof(colors[0]);
+
+  tft.setTextSize(3);
+  for (int i = 0; i < text.length(); i++) {
+    tft.setCursor(x + (i * 18), y); // Adjust spacing
+    tft.setTextColor(colors[i % colorCount]); // Cycle through rainbow colors
+    tft.print(text[i]);
+  }
+}
